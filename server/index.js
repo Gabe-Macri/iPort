@@ -2,16 +2,20 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { config } from './config.js';
 import { initDatabase, getChats, getMessages, getAttachmentInfo, getIsDemoMode, dbEvents } from './db.js';
 import { sendMessage } from './sender.js';
 import { runDiagnostics } from './diagnostics.js';
 import { mockChats, mockMessages } from './mockData.js';
+import { togglePinChat, getPinnedList } from './pinnedStorage.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const DIST_DIR = path.resolve(__dirname, '..', 'dist');
 const PUBLIC_DIR = path.resolve(__dirname, '..', 'public');
+const getStaticDir = () => (fs.existsSync(DIST_DIR) ? DIST_DIR : PUBLIC_DIR);
 
 // MIME types for static files
 const MIME_TYPES = {
@@ -157,7 +161,16 @@ const server = http.createServer(async (req, res) => {
   // --- API: Get Conversations ---
   if (pathname === '/api/chats' && method === 'GET') {
     const chats = getChats(100);
-    return sendJson(res, 200, { chats });
+    return sendJson(res, 200, { chats, pinned: getPinnedList() });
+  }
+
+  // --- API: Toggle Pinned Chat ---
+  const chatPinMatch = pathname.match(/^\/api\/chats\/([^/]+)\/pin$/);
+  if (chatPinMatch && method === 'POST') {
+    const targetChatId = chatPinMatch[1];
+    const result = togglePinChat(targetChatId);
+    broadcastSSE('pinned_update', result);
+    return sendJson(res, 200, { success: true, ...result });
   }
 
   // --- API: Get Messages for a Chat ---
@@ -199,8 +212,20 @@ const server = http.createServer(async (req, res) => {
           mockMessages[chatId].push(outMsg);
         }
 
-        // Broadcast to all connected clients
+        // Broadcast new message to all connected clients
         broadcastSSE('new_messages', [outMsg]);
+
+        // Simulate read receipt 1.2s later in demo mode
+        setTimeout(() => {
+          outMsg.status = 'read';
+          outMsg.read_at = Date.now();
+          broadcastSSE('message_receipt', {
+            id: outMsg.id,
+            chat_id: outMsg.chat_id,
+            status: 'read',
+            read_at: outMsg.read_at
+          });
+        }, 1200);
 
         // Simulate an automated friendly reply 2 seconds later in demo mode
         setTimeout(() => {
@@ -321,29 +346,56 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // --- Serve Static Frontend Files ---
+  // --- Serve Static Frontend Files (Optimized with Gzip & Immutable Caching) ---
+  const currentStaticDir = getStaticDir();
   let safePath = pathname === '/' ? '/index.html' : pathname;
   safePath = path.normalize(safePath).replace(/^(\.\.[/\\])+/, '');
-  const filePath = path.join(PUBLIC_DIR, safePath);
+  let filePath = path.join(currentStaticDir, safePath);
+
+  // If file doesn't exist in dist, check public (for static assets like favicon or manifest)
+  if (!fs.existsSync(filePath) && fs.existsSync(path.join(PUBLIC_DIR, safePath))) {
+    filePath = path.join(PUBLIC_DIR, safePath);
+  }
+
+  const serveStaticFile = (targetFile) => {
+    const ext = path.extname(targetFile).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    const isAsset = targetFile.includes('/assets/') || targetFile.includes('\\assets\\');
+    const cacheControl = ext === '.html' ? 'no-cache' : isAsset ? 'public, max-age=31536000, immutable' : 'public, max-age=3600';
+
+    const acceptEncoding = req.headers['accept-encoding'] || '';
+    const shouldGzip = acceptEncoding.includes('gzip') && ['.js', '.css', '.html', '.svg', '.json'].includes(ext);
+
+    const headers = {
+      'Content-Type': contentType,
+      'Cache-Control': cacheControl
+    };
+
+    if (shouldGzip) {
+      headers['Content-Encoding'] = 'gzip';
+      res.writeHead(200, headers);
+      const rawStream = fs.createReadStream(targetFile);
+      const gzipStream = zlib.createGzip({ level: 6 });
+      return rawStream.pipe(gzipStream).pipe(res);
+    }
+
+    res.writeHead(200, headers);
+    const stream = fs.createReadStream(targetFile);
+    return stream.pipe(res);
+  };
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    res.writeHead(200, {
-      'Content-Type': contentType,
-      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600'
-    });
-    const stream = fs.createReadStream(filePath);
-    return stream.pipe(res);
+    return serveStaticFile(filePath);
   }
 
   // Fallback for SPA routing to index.html
-  const indexPath = path.join(PUBLIC_DIR, 'index.html');
+  const indexPath = path.join(currentStaticDir, 'index.html');
   if (fs.existsSync(indexPath)) {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    const stream = fs.createReadStream(indexPath);
-    return stream.pipe(res);
+    return serveStaticFile(indexPath);
   }
+
+  res.writeHead(404, { 'Content-Type': 'text/plain' });
+  res.end('Not Found');
 
   res.writeHead(404, { 'Content-Type': 'text/plain' });
   res.end('Not Found');

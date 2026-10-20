@@ -15,6 +15,7 @@ export const mockChats = [
     display_name: 'The Dinner Crew 🍕',
     service_name: 'iMessage',
     is_group: true,
+    is_pinned: true,
     participants: [
       { id: '+14155552671', name: 'Sophia Chen' },
       { id: '+14155558932', name: 'Marcus Vance' },
@@ -24,7 +25,9 @@ export const mockChats = [
       text: "Table is reserved for 7:30! Let's meet out front.",
       date: now - 3 * min,
       is_from_me: 0,
-      sender: '+14155552671'
+      sender: '+14155552671',
+      status: null,
+      read_at: null
     },
     unread_count: 1
   },
@@ -35,6 +38,7 @@ export const mockChats = [
     display_name: 'Alex Miller',
     service_name: 'iMessage',
     is_group: false,
+    is_pinned: true,
     participants: [
       { id: 'alex.miller@example.com', name: 'Alex Miller' }
     ],
@@ -42,7 +46,9 @@ export const mockChats = [
       text: "Just sent the design files over. Let me know what you think!",
       date: now - 25 * min,
       is_from_me: 0,
-      sender: 'alex.miller@example.com'
+      sender: 'alex.miller@example.com',
+      status: null,
+      read_at: null
     },
     unread_count: 0
   },
@@ -53,6 +59,7 @@ export const mockChats = [
     display_name: 'Sarah Jenkins',
     service_name: 'SMS',
     is_group: false,
+    is_pinned: false,
     participants: [
       { id: '+14155559812', name: 'Sarah Jenkins' }
     ],
@@ -60,7 +67,10 @@ export const mockChats = [
       text: "Thanks! See you tomorrow morning.",
       date: now - 2 * hour,
       is_from_me: 1,
-      sender: null
+      sender: null,
+      status: 'delivered',
+      read_at: null,
+      delivered_at: now - 119 * min
     },
     unread_count: 0
   },
@@ -71,6 +81,7 @@ export const mockChats = [
     display_name: 'David Kim',
     service_name: 'iMessage',
     is_group: false,
+    is_pinned: false,
     participants: [
       { id: '+14155553321', name: 'David Kim' }
     ],
@@ -78,7 +89,9 @@ export const mockChats = [
       text: "Check out this screenshot from the new build",
       date: now - 1 * day,
       is_from_me: 0,
-      sender: '+14155553321'
+      sender: '+14155553321',
+      status: null,
+      read_at: null
     },
     unread_count: 0
   }
@@ -95,6 +108,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: '+14155558932',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       reactions: []
     },
     {
@@ -106,6 +121,8 @@ export const mockMessages = {
       is_from_me: 1,
       sender: null,
       service: 'iMessage',
+      status: 'read',
+      read_at: now - 41 * min,
       reactions: [
         { type: 2000, emoji: '❤️', sender: '+14155552671' },
         { type: 2001, emoji: '👍', sender: '+14155554109' }
@@ -120,6 +137,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: '+14155554109',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       reactions: []
     },
     {
@@ -131,6 +150,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: '+14155552671',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       reactions: []
     },
     {
@@ -142,6 +163,8 @@ export const mockMessages = {
       is_from_me: 1,
       sender: null,
       service: 'iMessage',
+      status: 'read',
+      read_at: now - 12 * min,
       reactions: []
     },
     {
@@ -153,6 +176,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: '+14155552671',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       reactions: [
         { type: 2001, emoji: '👍', sender: 'me' }
       ]
@@ -168,6 +193,8 @@ export const mockMessages = {
       is_from_me: 1,
       sender: null,
       service: 'iMessage',
+      status: 'read',
+      read_at: now - 105 * min,
       reactions: []
     },
     {
@@ -179,6 +206,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: 'alex.miller@example.com',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       reactions: []
     },
     {
@@ -190,6 +219,8 @@ export const mockMessages = {
       is_from_me: 1,
       sender: null,
       service: 'iMessage',
+      status: 'read',
+      read_at: now - 45 * min,
       reactions: [
         { type: 2004, emoji: '‼️', sender: 'alex.miller@example.com' }
       ]
@@ -203,6 +234,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: 'alex.miller@example.com',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       reactions: []
     }
   ],
@@ -216,6 +249,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: '+14155559812',
       service: 'SMS',
+      status: null,
+      read_at: null,
       reactions: []
     },
     {
@@ -227,6 +262,9 @@ export const mockMessages = {
       is_from_me: 1,
       sender: null,
       service: 'SMS',
+      status: 'delivered',
+      delivered_at: now - 118 * min,
+      read_at: null,
       reactions: []
     }
   ],
@@ -240,6 +278,8 @@ export const mockMessages = {
       is_from_me: 0,
       sender: '+14155553321',
       service: 'iMessage',
+      status: null,
+      read_at: null,
       attachments: [
         {
           id: 99,

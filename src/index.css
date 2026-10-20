@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-height: 100%;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Glassmorphism helpers */
+.glass-header {
+  background: rgba(20, 20, 22, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.glass-header-light {
+  background: rgba(246, 246, 246, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* iOS message bubble corners */
+.bubble-outgoing-imessage {
+  background-color: #007aff;
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble-outgoing-sms {
+  background-color: #34c759;
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+}
+
+.bubble-incoming {
+  background-color: #26252a;
+  color: #ffffff;
+  border-bottom-left-radius: 4px;
+}
+
+.light .bubble-incoming {
+  background-color: #e9e9eb;
+  color: #000000;
+}
+
+/* Safe area support for notched phones / mobile browsers */
+.safe-bottom {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.safe-top {
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+

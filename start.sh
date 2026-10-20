@@ -33,5 +33,29 @@ echo "  Full Disk:     $FDA_STATUS"
 echo "=========================================================="
 echo ""
 
-# Start server
-node server/index.js
+# Mode 1: Development Mode (Unified Backend + Vite HMR in a single terminal)
+if [ "$1" = "dev" ] || [ "$1" = "--dev" ]; then
+  echo "🚀 Starting iPort in Development Mode (Unified Backend + Vite HMR)..."
+  echo "   Backend API: http://localhost:3000"
+  echo "   Vite Client: http://localhost:5173"
+  echo "   (Press Ctrl+C to terminate both)"
+  echo ""
+
+  # Trap SIGINT/SIGTERM to kill all background child processes on exit
+  trap 'echo -e "\n🛑 Stopping iPort..."; kill $(jobs -p) 2>/dev/null || true; exit 0' EXIT INT TERM
+
+  node --watch server/index.js &
+  SERVER_PID=$!
+
+  ./node_modules/.bin/vite &
+  VITE_PID=$!
+
+  wait
+else
+  # Mode 2: Production Mode (Default - Single unified port 3000)
+  echo "📦 Compiling optimized React frontend..."
+  npm run build
+  echo ""
+  echo "⚡ Launching unified iPort server..."
+  node server/index.js
+fi

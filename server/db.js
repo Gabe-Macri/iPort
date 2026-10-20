@@ -5,6 +5,7 @@ import { EventEmitter } from 'node:events';
 import { config } from './config.js';
 import { parseAttributedBody } from './typedstream.js';
 import { mockChats, mockMessages } from './mockData.js';
+import { isChatPinned } from './pinnedStorage.js';
 
 export const dbEvents = new EventEmitter();
 
@@ -23,20 +24,46 @@ const REACTION_MAP = {
 };
 
 /**
+ * Parses read receipt status (Delivered vs Read at timestamp) for outgoing messages.
+ */
+export function parseReceiptStatus(isFromMe, rawDateDelivered, rawDateRead) {
+  if (!isFromMe) {
+    return { status: null, delivered_at: null, read_at: null };
+  }
+
+  const readAt = rawDateRead && rawDateRead !== '0' && rawDateRead !== 'null' ? appleDateToTimestamp(rawDateRead) : null;
+  const deliveredAt = rawDateDelivered && rawDateDelivered !== '0' && rawDateDelivered !== 'null' ? appleDateToTimestamp(rawDateDelivered) : null;
+
+  if (readAt) {
+    return { status: 'read', delivered_at: deliveredAt, read_at: readAt };
+  }
+  if (deliveredAt) {
+    return { status: 'delivered', delivered_at: deliveredAt, read_at: null };
+  }
+  return { status: 'delivered', delivered_at: null, read_at: null };
+}
+
+/**
  * Converts Apple epoch (nanoseconds since 2001-01-01) to standard Unix milliseconds.
+ * Supports strings, BigInts, and numbers to prevent 64-bit integer overflow.
  */
 export function appleDateToTimestamp(appleDate) {
   if (!appleDate) return Date.now();
-  // Modern macOS uses nanoseconds (> 1e15)
-  if (appleDate > 1e15) {
-    return Math.floor(appleDate / 1000000) + 978307200000;
+  try {
+    const b = typeof appleDate === 'bigint' ? appleDate : BigInt(appleDate);
+    // Nanoseconds (> 1e15)
+    if (b > 1000000000000000n) {
+      return Number(b / 1000000n) + 978307200000;
+    }
+    // Seconds (< 1e11)
+    if (b < 100000000000n) {
+      return Number(b * 1000n) + 978307200000;
+    }
+    // Microseconds
+    return Number(b / 1000n) + 978307200000;
+  } catch {
+    return Date.now();
   }
-  // Older macOS uses seconds (< 1e11)
-  if (appleDate < 1e11) {
-    return appleDate * 1000 + 978307200000;
-  }
-  // Microseconds
-  return Math.floor(appleDate / 1000) + 978307200000;
 }
 
 /**
@@ -104,12 +131,11 @@ export function getChats(limit = 100) {
           ORDER BY m.date DESC LIMIT 1
         ) as last_message_id
       FROM chat c
-      ORDER BY (
-        SELECT MAX(m.date)
+      ORDER BY COALESCE((
+        SELECT m.date
         FROM message m
-        JOIN chat_message_join cmj ON m.ROWID = cmj.message_id
-        WHERE cmj.chat_id = c.ROWID
-      ) DESC
+        WHERE m.ROWID = last_message_id
+      ), 0) DESC
       LIMIT ?;
     `;
 
@@ -129,7 +155,9 @@ export function getChats(limit = 100) {
         m.guid,
         m.text,
         m.attributedBody,
-        m.date,
+        CAST(m.date AS TEXT) as raw_date,
+        CAST(m.date_read AS TEXT) as raw_date_read,
+        CAST(m.date_delivered AS TEXT) as raw_date_delivered,
         m.is_from_me,
         m.handle_id,
         h.id as sender,
@@ -141,20 +169,32 @@ export function getChats(limit = 100) {
     `);
 
     for (const row of chatRows) {
-      const participants = handleStmt.all(row.chat_id);
+      let participants = handleStmt.all(row.chat_id) || [];
       let lastMessage = null;
 
       if (row.last_message_id) {
         const msgRow = msgStmt.get(row.last_message_id);
         if (msgRow) {
           const body = msgRow.text || parseAttributedBody(msgRow.attributedBody) || (msgRow.cache_has_attachments ? '📷 Attachment' : '');
+          const receipt = parseReceiptStatus(msgRow.is_from_me === 1, msgRow.raw_date_delivered, msgRow.raw_date_read);
           lastMessage = {
             id: msgRow.message_id,
             text: body,
-            date: appleDateToTimestamp(msgRow.date),
+            date: appleDateToTimestamp(msgRow.raw_date),
             is_from_me: msgRow.is_from_me === 1,
-            sender: msgRow.sender
+            sender: msgRow.sender,
+            status: receipt.status,
+            read_at: receipt.read_at,
+            delivered_at: receipt.delivered_at
           };
+        }
+      }
+
+      // If no participants found in join table, infer from chat_identifier or guid
+      if (participants.length === 0) {
+        const inferredId = row.chat_identifier || (row.guid ? row.guid.replace(/^[^;]+;[^;]+;/, '') : '');
+        if (inferredId && !inferredId.startsWith('chat')) {
+          participants = [{ id: inferredId, uncanonicalized_id: inferredId }];
         }
       }
 
@@ -168,6 +208,13 @@ export function getChats(limit = 100) {
         }
       }
 
+      // Only include chats that have had messages or participants
+      if (!lastMessage && participants.length === 0) {
+        continue;
+      }
+
+      const isPinned = isChatPinned(row.chat_id, row.guid, row.chat_identifier);
+
       chats.push({
         chat_id: row.chat_id,
         guid: row.guid,
@@ -175,6 +222,7 @@ export function getChats(limit = 100) {
         display_name: displayName,
         service_name: row.service_name || (row.guid && row.guid.startsWith('SMS') ? 'SMS' : 'iMessage'),
         is_group: isGroup,
+        is_pinned: isPinned,
         participants,
         last_message: lastMessage,
         unread_count: 0
@@ -204,7 +252,9 @@ export function getMessages(chatId, limit = 60, beforeId = null) {
         m.guid,
         m.text,
         m.attributedBody,
-        m.date,
+        CAST(m.date AS TEXT) as raw_date,
+        CAST(m.date_read AS TEXT) as raw_date_read,
+        CAST(m.date_delivered AS TEXT) as raw_date_delivered,
         m.is_from_me,
         m.handle_id,
         h.id as sender,
@@ -309,15 +359,20 @@ export function getMessages(chatId, limit = 60, beforeId = null) {
         }
       }
 
+      const receipt = parseReceiptStatus(r.is_from_me === 1, r.raw_date_delivered, r.raw_date_read);
+
       messages.push({
         id: r.id,
         guid: r.guid,
         chat_id: chatId,
         text: body,
-        date: appleDateToTimestamp(r.date),
+        date: appleDateToTimestamp(r.raw_date),
         is_from_me: r.is_from_me === 1,
         sender: r.sender,
         service: r.service || 'iMessage',
+        status: receipt.status,
+        read_at: receipt.read_at,
+        delivered_at: receipt.delivered_at,
         attachments,
         reactions: reactionsByGuid[r.guid] || []
       });
@@ -378,7 +433,9 @@ function startPolling() {
             cmj.chat_id,
             m.text,
             m.attributedBody,
-            m.date,
+            CAST(m.date AS TEXT) as raw_date,
+            CAST(m.date_read AS TEXT) as raw_date_read,
+            CAST(m.date_delivered AS TEXT) as raw_date_delivered,
             m.is_from_me,
             m.handle_id,
             h.id as sender,
@@ -399,15 +456,19 @@ function startPolling() {
         const processed = [];
         for (const r of newRows) {
           const body = r.text || parseAttributedBody(r.attributedBody) || '';
+          const receipt = parseReceiptStatus(r.is_from_me === 1, r.raw_date_delivered, r.raw_date_read);
           processed.push({
             id: r.id,
             guid: r.guid,
             chat_id: r.chat_id,
             text: body,
-            date: appleDateToTimestamp(r.date),
+            date: appleDateToTimestamp(r.raw_date),
             is_from_me: r.is_from_me === 1,
             sender: r.sender,
             service: r.service || 'iMessage',
+            status: receipt.status,
+            read_at: receipt.read_at,
+            delivered_at: receipt.delivered_at,
             associated_message_guid: r.associated_message_guid,
             associated_message_type: r.associated_message_type,
             is_reaction: Boolean(r.associated_message_type && r.associated_message_type >= 2000)
