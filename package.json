@@ -1,0 +1,20 @@
+{
+  "name": "iport",
+  "version": "1.0.0",
+  "description": "Clean, fast, and minimal iMessage web relay for non-Apple devices",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
+  },
+  "keywords": [
+    "imessage",
+    "web",
+    "relay",
+    "macos",
+    "sms"
+  ],
+  "author": "",
+  "license": "MIT"
+}

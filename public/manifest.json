@@ -1,0 +1,17 @@
+{
+  "name": "iPort - iMessage Relay",
+  "short_name": "iPort",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#007AFF",
+  "description": "Fast and minimal iMessage web relay for non-Apple devices",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
