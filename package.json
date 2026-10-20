@@ -4,6 +4,11 @@
   "description": "Clean, fast, and minimal iMessage web relay for non-Apple devices",
   "type": "module",
   "main": "server/index.js",
+  "types": "sdk/index.ts",
+  "exports": {
+    ".": "./server/index.js",
+    "./sdk": "./sdk/index.ts"
+  },
   "scripts": {
     "start": "./start.sh",
     "start:full": "./start.sh full",
@@ -12,6 +17,7 @@
     "dev": "./start.sh dev",
     "build": "vite build",
     "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
     "server": "node server/index.js"
   },
   "dependencies": {
@@ -21,10 +27,12 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@types/node": "^26.6.5",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
+    "typescript": "^7.0.2",
     "vite": "^6.1.0"
   },
   "keywords": [

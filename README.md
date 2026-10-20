@@ -83,6 +83,90 @@ curl -N http://localhost:3000/api/events
 
 ---
 
+## TypeScript API Helpers & SDK
+
+iPort includes a comprehensive, strongly-typed TypeScript SDK (`sdk/`) that works seamlessly in both Node.js (scripts, background daemons, Raycast extensions, bots) and modern browser environments.
+
+### 1. Initialize Client
+
+```typescript
+import { createIPortClient } from './sdk';
+
+const client = createIPortClient({
+  baseUrl: 'http://localhost:3000', // Optional: defaults to http://localhost:3000 or current origin
+  pin: '1234'                       // Optional: pass PIN if IPORT_PIN is configured
+});
+```
+
+### 2. Send an iMessage or SMS
+
+```typescript
+// Quick text dispatch
+await client.sendText('+14155552671', 'Hey from TypeScript!', 'iMessage');
+
+// Full options
+await client.sendMessage({
+  recipient: 'user@icloud.com',
+  text: 'Quarterly review attached.',
+  service: 'iMessage'
+});
+```
+
+### 3. Query Chats and Messages
+
+```typescript
+// Fetch conversations with pinned flags and unread counts
+const { chats, pinned } = await client.getChats();
+
+// Fetch paginated messages for a conversation
+const { messages } = await client.getMessages(chats[0].chat_id, {
+  limit: 50,
+  before: Date.now()
+});
+```
+
+### 4. Real-Time Event Subscription (SSE)
+
+Subscribe to incoming messages, read receipts, and pin updates with full TypeScript types:
+
+```typescript
+const unsubscribe = client.subscribe({
+  onOpen: () => console.log('Connected to iMessage relay'),
+  onNewMessages: (messages) => {
+    for (const msg of messages) {
+      console.log(`[${msg.service}] ${msg.sender}: ${msg.text}`);
+    }
+  },
+  onReceipt: (receipt) => {
+    console.log(`Message #${receipt.id} marked as ${receipt.status}`);
+  },
+  onPinnedUpdate: ({ pinnedList }) => {
+    console.log('Pinned chats updated:', pinnedList);
+  },
+  onError: (err) => console.error('Relay error:', err)
+});
+
+// Call when done
+// unsubscribe();
+```
+
+### 5. Running the Included Examples
+
+Ready-to-run TypeScript examples are provided in `examples/`:
+
+```bash
+# Send test message
+npx tsx examples/send-message.ts
+
+# Stream live messages in your terminal
+npx tsx examples/listen-stream.ts
+
+# Query conversations and diagnostics
+npx tsx examples/fetch-chats.ts
+```
+
+---
+
 ## macOS Host Permissions (Full Disk Access)
 
 macOS protects your `~/Library/Messages/chat.db` database with Transparency, Consent, and Control (TCC). To let iPort read live conversations, grant Full Disk Access to your terminal or process:
