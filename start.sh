@@ -5,7 +5,7 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$DIR"
 
 echo "=========================================================="
-echo "           iPort — iMessage Web Relay                 "
+echo "           iPort — iMessage Relay & API                   "
 echo "=========================================================="
 
 # Check node
@@ -23,39 +23,49 @@ fi
 # Quick Full Disk Access probe
 FDA_STATUS="Checking..."
 if sqlite3 "$HOME/Library/Messages/chat.db" "SELECT count(*) FROM message LIMIT 1;" >/dev/null 2>&1; then
-  FDA_STATUS=" Granted (Full Disk Access active)"
+  FDA_STATUS="Granted (Full Disk Access active)"
 else
-  FDA_STATUS="Not Granted (iPort will run with Demo/Setup Mode until enabled)"
+  FDA_STATUS="Not Granted (Running in Demo/Simulation Mode)"
 fi
 
-echo "  macOS Status:  $(sw_vers -productName) $(sw_vers -productVersion)"
-echo "  Full Disk:     $FDA_STATUS"
+echo "  Platform:   $(sw_vers -productName 2>/dev/null || uname -s) $(sw_vers -productVersion 2>/dev/null || uname -r)"
+echo "  Full Disk:  $FDA_STATUS"
 echo "=========================================================="
 echo ""
 
-# Mode 1: Development Mode (Unified Backend + Vite HMR in a single terminal)
-if [ "$1" = "dev" ] || [ "$1" = "--dev" ]; then
-  echo " Starting iPort in Development Mode (Unified Backend + Vite HMR)..."
-  echo "   Backend API: http://localhost:3000"
-  echo "   Vite Client: http://localhost:5173"
+MODE_ARG="$1"
+
+# --- MODE 1: Headless API Only ---
+if [ "$MODE_ARG" = "api" ] || [ "$MODE_ARG" = "--api" ]; then
+  echo " Mode: Headless API Server (Strict JSON / SSE, no frontend assets)"
+  echo ""
+  exec node server/index.js --api "${@:2}"
+
+# --- MODE 2: Development Mode (Backend + Vite HMR) ---
+elif [ "$MODE_ARG" = "dev" ] || [ "$MODE_ARG" = "--dev" ]; then
+  echo " Mode: Development (Unified Backend API + Vite HMR)"
+  echo "   Backend:     http://localhost:3000/api"
+  echo "   Vite Dev:    http://localhost:5173"
   echo "   (Press Ctrl+C to terminate both)"
   echo ""
 
-  # Trap SIGINT/SIGTERM to kill all background child processes on exit
   trap 'echo -e "\n Stopping iPort..."; kill $(jobs -p) 2>/dev/null || true; exit 0' EXIT INT TERM
 
   node --watch server/index.js &
-  SERVER_PID=$!
-
   ./node_modules/.bin/vite &
-  VITE_PID=$!
-
   wait
+
+# --- MODE 3: Full-Stack (Web Client + API together) ---
 else
-  # Mode 2: Production Mode (Default - Single unified port 3000)
-  echo " Compiling optimized React frontend..."
-  npm run build
-  echo ""
-  echo " Launching unified iPort server..."
-  node server/index.js
+  echo " Mode: Full-Stack (Web Client + Headless API unified on single port)"
+
+  # Auto-build frontend if dist does not exist or rebuild requested
+  if [ ! -d "dist" ] || [ "$MODE_ARG" = "build" ] || [ "$MODE_ARG" = "--rebuild" ]; then
+    echo " Compiling frontend assets..."
+    npm run build
+    echo ""
+  fi
+
+  echo " Launching unified server..."
+  exec node server/index.js --full "$@"
 fi

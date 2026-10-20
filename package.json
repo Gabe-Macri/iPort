@@ -6,6 +6,9 @@
   "main": "server/index.js",
   "scripts": {
     "start": "./start.sh",
+    "start:full": "./start.sh full",
+    "start:api": "./start.sh api",
+    "api": "node server/index.js --api",
     "dev": "./start.sh dev",
     "build": "vite build",
     "preview": "vite preview",

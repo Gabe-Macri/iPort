@@ -36,9 +36,9 @@ export function ChatList({
 
   if (filteredChats.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-40 text-neutral-500 text-xs px-4 text-center">
-        <MessageSquare className="w-6 h-6 mb-2 opacity-30" />
-        <p className="text-neutral-500">{isSearching ? 'No results found.' : 'No conversations.'}</p>
+      <div className="flex flex-col items-center justify-center h-40 text-zinc-500 text-xs px-4 text-center">
+        <MessageSquare className="w-5 h-5 mb-2 opacity-40" />
+        <p className="text-zinc-500 font-mono text-[11px]">{isSearching ? 'No results found' : 'No conversations'}</p>
       </div>
     );
   }
@@ -74,47 +74,51 @@ export function ChatList({
               key={chat.chat_id}
               onClick={() => onSelectChat(chat)}
               className={`
-                group flex items-center gap-3 px-2.5 py-2 rounded-xl cursor-pointer transition-colors relative
-                ${isActive ? 'bg-[#2c2c2e]' : 'hover:bg-[#202022] active:bg-[#262628]'}
+                group flex items-center gap-2.5 px-2.5 py-1.5 rounded-md cursor-pointer transition-colors relative
+                ${
+                  isActive
+                    ? 'bg-zinc-800/90 text-white border-l-2 border-blue-500 pl-2'
+                    : 'hover:bg-zinc-900/80 text-zinc-300'
+                }
               `}
             >
-              {/* Avatar */}
+              {/* Squircle Avatar */}
               <div
                 className={`
-                  w-10 h-10 rounded-full shrink-0 flex items-center justify-center font-medium text-xs
-                  border border-white/[0.06] ${avatarClass}
+                  w-7 h-7 rounded-md shrink-0 flex items-center justify-center font-mono text-[10px] font-semibold
+                  ${avatarClass}
                 `}
               >
-                {isGroup ? <Users className="w-4 h-4 text-neutral-300" /> : initials}
+                {isGroup ? <Users className="w-3.5 h-3.5 text-zinc-300" /> : initials}
               </div>
 
               {/* Meta */}
               <div className="flex-1 min-w-0 pr-1">
                 <div className="flex items-baseline justify-between mb-0.5">
-                  <span className="font-semibold text-[13.5px] text-neutral-100 truncate tracking-tight">
+                  <span className="font-medium text-[13px] text-zinc-100 truncate tracking-tight">
                     {chat.display_name}
                   </span>
-                  <span className="text-[11px] text-neutral-500 shrink-0 ml-2 font-normal">
+                  <span className="font-mono text-[10px] text-zinc-500 shrink-0 ml-1.5 font-normal">
                     {timeStr}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-[12.5px] text-neutral-400 truncate max-w-[200px] leading-tight font-normal">
+                  <span className="text-[11.5px] text-zinc-400 truncate max-w-[180px] leading-tight font-normal">
                     {snippet}
                   </span>
 
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     {/* Read receipt text in list if read */}
                     {chat.last_message?.is_from_me && chat.last_message?.status === 'read' && (
-                      <span className="text-[10px] text-neutral-500 font-normal">
+                      <span className="font-mono text-[9px] text-zinc-500">
                         Read
                       </span>
                     )}
 
                     {/* Unread indicator */}
                     {chat.unread_count > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-[#007aff]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                     )}
 
                     {/* Pin Action on Hover */}
@@ -124,7 +128,7 @@ export function ChatList({
                           e.stopPropagation();
                           onTogglePin(chat);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white rounded transition-opacity"
+                        className="opacity-0 group-hover:opacity-100 p-0.5 text-zinc-500 hover:text-white rounded transition-opacity"
                         title={chat.is_pinned ? 'Unpin' : 'Pin'}
                       >
                         {chat.is_pinned ? (

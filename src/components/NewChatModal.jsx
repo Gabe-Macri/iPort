@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, ArrowUp } from 'lucide-react';
+import { X, CornerDownLeft } from 'lucide-react';
 
 export function NewChatModal({ isOpen, onClose, onStartChat }) {
   const [recipient, setRecipient] = useState('');
@@ -29,101 +29,100 @@ export function NewChatModal({ isOpen, onClose, onStartChat }) {
   const isSms = service === 'SMS';
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-[#1c1c1e] border border-white/10 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-[#101013] border border-white/[0.08] rounded-xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in duration-150">
         {/* Header */}
-        <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.06]">
-          <h3 className="font-semibold text-white text-[15px] tracking-tight">New Message</h3>
+        <div className="h-11 px-4 flex items-center justify-between border-b border-white/[0.08] bg-[#141418]">
+          <h3 className="font-mono text-xs font-semibold text-zinc-100 uppercase tracking-wider">
+            Compose Message
+          </h3>
           <button
             onClick={onClose}
-            className="w-7 h-7 bg-[#2c2c2e] hover:bg-[#3a3a3c] text-neutral-400 hover:text-white rounded-full flex items-center justify-center transition-colors"
+            className="p-1 text-zinc-400 hover:text-white rounded hover:bg-white/[0.06] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-3.5">
+        <form onSubmit={handleSubmit} className="p-4 space-y-3">
           {/* To Field */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-[#252528] border border-white/[0.06] rounded-xl focus-within:border-white/20 transition-colors">
-            <span className="text-[13px] font-medium text-neutral-400 select-none">To:</span>
+          <div>
+            <label className="block font-mono text-[10px] text-zinc-400 uppercase tracking-wider mb-1">
+              Recipient
+            </label>
             <input
               type="text"
               required
               autoFocus
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
-              placeholder="Phone number or Apple ID"
-              className="flex-1 bg-transparent text-[13.5px] text-white placeholder-neutral-500 focus:outline-none"
+              placeholder="+14155551234 or email@icloud.com"
+              className="w-full bg-[#16161a] border border-white/[0.06] rounded-md px-3 py-1.5 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 font-mono transition-colors"
             />
           </div>
 
-          {/* Service Segmented Switch */}
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[11px] font-medium text-neutral-400 uppercase tracking-wider">
-              Send with
-            </span>
-            <div className="flex bg-[#252528] p-0.5 rounded-lg border border-white/[0.06] text-[12px]">
+          {/* Service Selector */}
+          <div>
+            <label className="block font-mono text-[10px] text-zinc-400 uppercase tracking-wider mb-1">
+              Network Protocol
+            </label>
+            <div className="flex bg-[#16161a] p-0.5 rounded-md border border-white/[0.06] text-xs font-mono">
               <button
                 type="button"
                 onClick={() => setService('iMessage')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                className={`flex-1 py-1 rounded font-medium transition-all ${
                   service === 'iMessage'
-                    ? 'bg-[#007aff] text-white shadow-sm'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-blue-600 text-white shadow'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                iMessage
+                iMessage (Apple)
               </button>
               <button
                 type="button"
                 onClick={() => setService('SMS')}
-                className={`px-3 py-1 rounded-md font-medium transition-all ${
+                className={`flex-1 py-1 rounded font-medium transition-all ${
                   service === 'SMS'
-                    ? 'bg-[#34c759] text-white shadow-sm'
-                    : 'text-neutral-400 hover:text-white'
+                    ? 'bg-emerald-600 text-white shadow'
+                    : 'text-zinc-400 hover:text-white'
                 }`}
               >
-                SMS
+                SMS (Cellular)
               </button>
             </div>
           </div>
 
           {/* Message Area */}
           <div>
+            <label className="block font-mono text-[10px] text-zinc-400 uppercase tracking-wider mb-1">
+              Body
+            </label>
             <textarea
               required
               rows={3}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder={isSms ? 'Text Message' : 'iMessage'}
-              className="w-full bg-[#252528] border border-white/[0.06] rounded-xl px-3.5 py-2.5 text-[14px] text-neutral-100 placeholder-neutral-500 focus:outline-none focus:border-white/20 transition-colors resize-none leading-relaxed"
+              placeholder="Write message contents..."
+              className="w-full bg-[#16161a] border border-white/[0.06] rounded-md p-2.5 text-[13px] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors resize-none leading-relaxed"
             />
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end gap-2 pt-1">
+          <div className="flex items-center justify-end gap-2 pt-1 border-t border-white/[0.04]">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-1.5 text-[13px] font-medium text-neutral-400 hover:text-white rounded-lg transition-colors"
+              className="px-3 py-1 text-xs font-mono text-zinc-400 hover:text-white rounded transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading || !recipient.trim() || !text.trim()}
-              className={`
-                flex items-center gap-1.5 font-medium text-[13px] px-4 py-1.5 rounded-lg transition-all shadow-sm
-                ${
-                  isSms
-                    ? 'bg-[#34c759] hover:bg-[#30b753] text-white'
-                    : 'bg-[#007aff] hover:bg-[#0071e3] text-white'
-                }
-                disabled:opacity-40 disabled:cursor-not-allowed
-              `}
+              className="flex items-center gap-1.5 px-3 py-1 bg-zinc-100 hover:bg-white text-zinc-900 font-mono text-xs font-medium rounded shadow transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <span>{loading ? 'Sending...' : 'Send'}</span>
-              <ArrowUp className="w-3.5 h-3.5 stroke-[2.5]" />
+              <CornerDownLeft className="w-3 h-3" />
             </button>
           </div>
         </form>
@@ -131,4 +130,3 @@ export function NewChatModal({ isOpen, onClose, onStartChat }) {
     </div>
   );
 }
-

@@ -24,12 +24,35 @@ if (fs.existsSync(envPath)) {
   }
 }
 
+// Parse command-line arguments for deployment overrides
+const args = process.argv.slice(2);
+const cliFlags = {};
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i];
+  if (arg === '--api' || arg === '-a') {
+    cliFlags.mode = 'api';
+  } else if (arg === '--full' || arg === '-f') {
+    cliFlags.mode = 'full';
+  } else if (arg === '--demo') {
+    cliFlags.forceDemo = true;
+  } else if (arg === '--port' || arg === '-p') {
+    cliFlags.port = parseInt(args[++i], 10);
+  } else if (arg === '--host' || arg === '-h') {
+    cliFlags.host = args[++i];
+  } else if (arg === '--pin') {
+    cliFlags.pin = args[++i];
+  }
+}
+
+const resolvedMode = cliFlags.mode || process.env.IPORT_MODE || 'full';
+
 export const config = {
-  port: parseInt(process.env.IPORT_PORT || process.env.PORT || '3000', 10),
-  host: process.env.IPORT_HOST || '0.0.0.0',
-  pin: process.env.IPORT_PIN || process.env.IPORT_PASSWORD || '',
+  mode: resolvedMode, // 'full' (Web Client + API) or 'api' (Headless API only)
+  port: cliFlags.port || parseInt(process.env.IPORT_PORT || process.env.PORT || '3000', 10),
+  host: cliFlags.host || process.env.IPORT_HOST || '0.0.0.0',
+  pin: cliFlags.pin || process.env.IPORT_PIN || process.env.IPORT_PASSWORD || '',
   chatDbPath: process.env.IPORT_DB_PATH || path.join(os.homedir(), 'Library', 'Messages', 'chat.db'),
   attachmentsPath: process.env.IPORT_ATTACHMENTS_PATH || path.join(os.homedir(), 'Library', 'Messages', 'Attachments'),
   pollIntervalMs: parseInt(process.env.IPORT_POLL_INTERVAL || '500', 10),
-  forceDemo: process.env.IPORT_DEMO === 'true' || process.env.IPORT_DEMO === '1'
+  forceDemo: cliFlags.forceDemo ?? (process.env.IPORT_DEMO === 'true' || process.env.IPORT_DEMO === '1')
 };

@@ -19,17 +19,17 @@ export function LightboxModal({ src, onClose }) {
     >
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 p-2 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 rounded-full transition-colors"
+        className="absolute top-4 right-4 p-1.5 text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 rounded-md border border-white/[0.08] transition-colors"
         title="Close (Esc)"
       >
-        <X className="w-6 h-6" />
+        <X className="w-4 h-4" />
       </button>
 
       <img
         src={src}
         alt="Full resolution preview"
         onClick={(e) => e.stopPropagation()}
-        className="max-w-[90vw] max-h-[90vh] object-contain rounded-xl shadow-2xl cursor-default animate-in fade-in zoom-in-95 duration-150"
+        className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default animate-in fade-in duration-150 border border-white/[0.08]"
       />
     </div>
   );

@@ -130,6 +130,9 @@ const server = http.createServer(async (req, res) => {
     const diag = await runDiagnostics();
     return sendJson(res, 200, {
       status: 'ok',
+      service: 'iPort Relay',
+      version: '1.0.0',
+      mode: config.mode,
       isDemo: getIsDemoMode(),
       authRequired: Boolean(config.pin),
       diagnostics: diag
@@ -347,6 +350,36 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // --- Strict Headless API Mode ---
+  if (config.mode === 'api') {
+    if (pathname === '/') {
+      return sendJson(res, 200, {
+        service: 'iPort API Relay',
+        version: '1.0.0',
+        mode: 'api',
+        status: 'ready',
+        isDemo: getIsDemoMode(),
+        authRequired: Boolean(config.pin),
+        endpoints: {
+          'GET /api/status': 'Diagnostics, permissions, mode, and relay health',
+          'GET /api/chats': 'List conversations with pinned metadata and unread counts',
+          'POST /api/chats/:id/pin': 'Toggle conversation pin state',
+          'GET /api/chats/:id/messages': 'Paginated chat messages (?limit=60&before=timestamp)',
+          'POST /api/messages/send': 'Send outbound iMessage or SMS ({ recipient, text, service })',
+          'GET /api/attachments/:id': 'Stream attachment media or file',
+          'GET /api/events': 'Real-time Server-Sent Events stream (new_messages, message_receipt, pinned_update)',
+          'POST /api/auth': 'Authenticate with PIN passcode'
+        }
+      });
+    }
+
+    return sendJson(res, 404, {
+      error: 'Not Found',
+      message: 'iPort is running in strict headless API mode. Frontend assets are disabled.',
+      mode: 'api'
+    });
+  }
+
   // --- Serve Static Frontend Files (Optimized with Gzip & Immutable Caching) ---
   const currentStaticDir = getStaticDir();
   let safePath = pathname === '/' ? '/index.html' : pathname;
@@ -397,9 +430,6 @@ const server = http.createServer(async (req, res) => {
 
   res.writeHead(404, { 'Content-Type': 'text/plain' });
   res.end('Not Found');
-
-  res.writeHead(404, { 'Content-Type': 'text/plain' });
-  res.end('Not Found');
 });
 
 // Start Server & Print Network Details
@@ -419,16 +449,28 @@ export function startServer() {
     }
 
     console.log('\n======================================================');
-    console.log('              💬 iPort - iMessage Web Relay             ');
-    console.log('======================================================');
-    console.log(`  Local URL:    http://localhost:${config.port}`);
+    if (config.mode === 'api') {
+      console.log('            iPort — Headless API Server               ');
+      console.log('======================================================');
+      console.log(`  Mode:         Headless API`);
+      console.log(`  API Base:     http://localhost:${config.port}/api`);
+      console.log(`  SSE Events:   http://localhost:${config.port}/api/events`);
+      console.log(`  API Docs:     http://localhost:${config.port}/`);
+    } else {
+      console.log('            iPort — Full-Stack Server                 ');
+      console.log('======================================================');
+      console.log(`  Mode:         Full-Stack (Web Client + API)`);
+      console.log(`  Web Client:   http://localhost:${config.port}`);
+      console.log(`  API Base:     http://localhost:${config.port}/api`);
+      console.log(`  SSE Events:   http://localhost:${config.port}/api/events`);
+    }
     for (const ip of addresses) {
-      console.log(`  Network URL:  http://${ip}:${config.port}  (Open on any phone/PC)`);
+      console.log(`  Network:      http://${ip}:${config.port}`);
     }
     if (config.pin) {
-      console.log(`  Security:     PIN protected (set via IPORT_PIN)`);
+      console.log(`  Security:     PIN passcode active`);
     } else {
-      console.log(`  Security:     No PIN set. (Set IPORT_PIN in .env to protect)`);
+      console.log(`  Security:     No PIN set (Set IPORT_PIN to protect)`);
     }
     console.log('======================================================\n');
   });

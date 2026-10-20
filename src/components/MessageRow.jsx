@@ -10,13 +10,13 @@ export const MessageRow = memo(function MessageRow({ message, isGroup, onOpenLig
   return (
     <div
       className={`
-        flex flex-col max-w-[78%] sm:max-w-[70%] md:max-w-[65%] mb-2 relative group
+        flex flex-col max-w-[85%] sm:max-w-[75%] md:max-w-[65%] mb-2 relative group
         ${isOutgoing ? 'self-end items-end ml-auto' : 'self-start items-start mr-auto'}
       `}
     >
       {/* Group Chat Sender Name */}
       {showSender && (
-        <span className="text-[11px] font-medium text-neutral-400 mb-1 ml-3 tracking-tight">
+        <span className="font-mono text-[10px] text-zinc-500 mb-0.5 ml-1 font-medium tracking-tight">
           {message.sender}
         </span>
       )}
@@ -35,7 +35,7 @@ export const MessageRow = memo(function MessageRow({ message, isGroup, onOpenLig
                   <div
                     key={att.id}
                     onClick={() => onOpenLightbox(src)}
-                    className="rounded-2xl overflow-hidden cursor-pointer shadow-md border border-neutral-700/50 hover:opacity-95 transition-opacity max-w-[280px]"
+                    className="rounded-lg overflow-hidden cursor-pointer shadow border border-white/[0.08] hover:opacity-95 transition-opacity max-w-[320px]"
                   >
                     <img
                       src={src}
@@ -53,10 +53,10 @@ export const MessageRow = memo(function MessageRow({ message, isGroup, onOpenLig
                   href={`/api/attachments/${att.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 bg-neutral-800/80 hover:bg-neutral-800 border border-neutral-700/60 px-3 py-2 rounded-xl text-xs text-neutral-200 transition-colors"
+                  className="flex items-center gap-2 bg-[#18181b] hover:bg-zinc-800 border border-white/[0.08] px-3 py-2 rounded-lg text-xs text-zinc-200 transition-colors"
                 >
-                  <Paperclip className="w-3.5 h-3.5 text-neutral-400" />
-                  <span className="truncate max-w-[180px] font-medium">
+                  <Paperclip className="w-3.5 h-3.5 text-zinc-400" />
+                  <span className="truncate max-w-[200px] font-mono text-[11px]">
                     {att.transfer_name || 'File Attachment'}
                   </span>
                 </a>
@@ -69,7 +69,7 @@ export const MessageRow = memo(function MessageRow({ message, isGroup, onOpenLig
         {message.text && (
           <div
             className={`
-              px-3.5 py-2 rounded-[18px] text-[15px] leading-relaxed break-words shadow-sm
+              px-3 py-2 text-[13.5px] leading-relaxed break-words shadow-sm
               ${
                 isOutgoing
                   ? isSms
@@ -87,7 +87,7 @@ export const MessageRow = memo(function MessageRow({ message, isGroup, onOpenLig
         {message.reactions && message.reactions.length > 0 && (
           <div
             className={`
-              absolute -top-2.5 flex items-center gap-0.5 bg-neutral-800/95 border border-neutral-700/80 rounded-full px-1.5 py-0.5 text-xs shadow-md backdrop-blur-sm z-10
+              absolute -top-2 flex items-center gap-0.5 bg-[#202024] border border-white/[0.1] rounded px-1.5 py-0.5 text-xs shadow-sm z-10
               ${isOutgoing ? '-left-2' : '-right-2'}
             `}
             title={message.reactions.map((r) => `${r.sender}: ${r.emoji}`).join(', ')}
@@ -99,16 +99,16 @@ export const MessageRow = memo(function MessageRow({ message, isGroup, onOpenLig
 
       {/* Delivery / Read Status Indicator */}
       {isOutgoing && (
-        <span className="text-[10px] text-neutral-400 mt-1 mr-1 font-medium select-none flex items-center gap-1 tracking-tight">
+        <span className="font-mono text-[9px] text-zinc-500 mt-1 mr-1 select-none flex items-center gap-1 tracking-tight">
           {message.pending ? (
-            'Sending...'
+            'sending...'
           ) : message.status === 'read' && message.read_at ? (
             <>
-              <span>Read</span>
-              <span className="text-neutral-500 font-normal">{formatTime(message.read_at)}</span>
+              <span>read</span>
+              <span className="text-zinc-600">{formatTime(message.read_at)}</span>
             </>
           ) : (
-            'Delivered'
+            'delivered'
           )}
         </span>
       )}

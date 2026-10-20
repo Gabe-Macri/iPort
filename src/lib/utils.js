@@ -46,8 +46,8 @@ export function getInitials(name) {
 
 export function getAvatarClass(isGroup) {
   if (isGroup) {
-    return 'bg-[#2c2c2e] text-neutral-300';
+    return 'bg-[#202024] text-zinc-300 border border-white/[0.08]';
   }
-  return 'bg-[#3a3a3c] text-neutral-200';
+  return 'bg-[#27272a] text-zinc-200 border border-white/[0.08]';
 }
 

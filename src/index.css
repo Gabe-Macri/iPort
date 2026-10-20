@@ -11,10 +11,18 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Custom minimal scrollbar */
+body {
+  background-color: #0c0c0e;
+  color: #f4f4f5;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Minimal professional scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -22,60 +30,37 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.22);
 }
 
-.light ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-}
-
-.light ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-/* Glassmorphism helpers */
-.glass-header {
-  background: rgba(20, 20, 22, 0.85);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-
-.glass-header-light {
-  background: rgba(246, 246, 246, 0.85);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-}
-
-/* iOS message bubble corners */
+/* Minimal professional message containers (no bubbly consumer tails) */
 .bubble-outgoing-imessage {
-  background-color: #007aff;
+  background-color: #1d4ed8;
   color: #ffffff;
-  border-bottom-right-radius: 4px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
 }
 
 .bubble-outgoing-sms {
-  background-color: #34c759;
+  background-color: #15803d;
   color: #ffffff;
-  border-bottom-right-radius: 4px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 8px;
 }
 
 .bubble-incoming {
-  background-color: #26252a;
-  color: #ffffff;
-  border-bottom-left-radius: 4px;
+  background-color: #18181b;
+  color: #f4f4f5;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
 }
 
-.light .bubble-incoming {
-  background-color: #e9e9eb;
-  color: #000000;
-}
-
-/* Safe area support for notched phones / mobile browsers */
+/* Mobile safe area padding */
 .safe-bottom {
   padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
@@ -83,4 +68,3 @@
 .safe-top {
   padding-top: max(12px, env(safe-area-inset-top));
 }
-

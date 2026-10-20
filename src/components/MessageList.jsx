@@ -38,8 +38,8 @@ export function MessageList({ messages, isGroup, onOpenLightbox }) {
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center p-8 text-neutral-600 text-[13px] select-none">
-        No Messages
+      <div className="flex-1 flex items-center justify-center p-8 text-zinc-600 font-mono text-xs select-none">
+        No messages in this conversation
       </div>
     );
   }
@@ -68,7 +68,7 @@ export function MessageList({ messages, isGroup, onOpenLightbox }) {
               }}
             >
               {item.type === 'divider' ? (
-                <div className="text-[11px] font-medium text-neutral-500 text-center select-none py-3">
+                <div className="font-mono text-[10px] text-zinc-600 text-center select-none py-2.5 uppercase tracking-wider">
                   {formatDateDivider(item.date)}
                 </div>
               ) : (
