@@ -44,13 +44,10 @@ export function getInitials(name) {
   return clean.slice(0, 2).toUpperCase() || name.slice(0, 1).toUpperCase();
 }
 
-export function getAvatarGradient(isGroup, isSms) {
+export function getAvatarClass(isGroup) {
   if (isGroup) {
-    return 'from-amber-500 to-rose-600';
+    return 'bg-[#2c2c2e] text-neutral-300';
   }
-  if (isSms) {
-    return 'from-emerald-500 to-teal-600';
-  }
-  return 'from-blue-500 to-indigo-600';
+  return 'bg-[#3a3a3c] text-neutral-200';
 }
 

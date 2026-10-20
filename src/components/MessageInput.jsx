@@ -40,9 +40,11 @@ export function MessageInput({ service, onSendMessage, onSendAttachment }) {
     }
   };
 
+  const canSend = Boolean(text.trim());
+
   return (
-    <footer className="p-3 bg-neutral-900 border-t border-neutral-800/80 safe-bottom">
-      <form onSubmit={handleSubmit} className="flex items-end gap-2">
+    <footer className="p-3 bg-[#161618] border-t border-white/[0.06] safe-bottom">
+      <form onSubmit={handleSubmit} className="flex items-end gap-2 max-w-4xl mx-auto w-full">
         {/* Hidden File Input for Attachment */}
         <input
           type="file"
@@ -55,37 +57,37 @@ export function MessageInput({ service, onSendMessage, onSendAttachment }) {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-full active:scale-95 transition-all shrink-0"
+          className="w-8 h-8 rounded-full bg-[#242426] hover:bg-[#2c2c2e] text-neutral-400 hover:text-white flex items-center justify-center transition-colors shrink-0 mb-0.5 active:scale-95"
           title="Add Attachment"
         >
-          <Plus className="w-5 h-5" />
+          <Plus className="w-4 h-4 stroke-[2.2]" />
         </button>
 
-        {/* Input Box */}
-        <div className="flex-1 bg-neutral-800 border border-neutral-700/60 rounded-2xl flex items-center px-3.5 py-1.5 focus-within:border-neutral-500 transition-colors shadow-inner">
+        {/* Input Capsule */}
+        <div className="flex-1 bg-[#1c1c1e] border border-white/[0.08] rounded-[20px] flex items-end px-3.5 py-1.5 focus-within:border-white/20 transition-all shadow-inner">
           <textarea
             ref={textareaRef}
             rows={1}
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={isSms ? 'Text Message • SMS' : 'iMessage'}
-            className="w-full bg-transparent text-[15px] text-neutral-100 placeholder-neutral-400 focus:outline-none resize-none leading-relaxed max-h-[120px]"
+            placeholder={isSms ? 'Text Message' : 'iMessage'}
+            className="w-full bg-transparent text-[15px] text-neutral-100 placeholder-neutral-500 focus:outline-none resize-none leading-relaxed max-h-[120px] py-0.5"
           />
         </div>
 
         {/* Send Button */}
         <button
           type="submit"
-          disabled={!text.trim()}
+          disabled={!canSend}
           className={`
-            w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm transition-all
+            w-8 h-8 rounded-full flex items-center justify-center shrink-0 mb-0.5 transition-all
             ${
-              text.trim()
+              canSend
                 ? isSms
-                  ? 'bg-emerald-500 text-white active:scale-95'
-                  : 'bg-blue-500 text-white active:scale-95'
-                : 'bg-neutral-800 text-neutral-500 cursor-not-allowed opacity-50'
+                  ? 'bg-[#34c759] text-white active:scale-95 shadow-sm'
+                  : 'bg-[#007aff] text-white active:scale-95 shadow-sm'
+                : 'bg-[#242426] text-neutral-600 cursor-not-allowed opacity-50'
             }
           `}
           title="Send"

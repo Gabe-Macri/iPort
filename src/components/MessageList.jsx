@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useMemo } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { MessageRow } from './MessageRow';
 import { formatDateDivider } from '../lib/utils';
-import { MessageCircle } from 'lucide-react';
 
 export function MessageList({ messages, isGroup, onOpenLightbox }) {
   const parentRef = useRef(null);
@@ -39,12 +38,8 @@ export function MessageList({ messages, isGroup, onOpenLightbox }) {
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-neutral-500 text-center">
-        <MessageCircle className="w-10 h-10 mb-3 opacity-30" />
-        <h4 className="text-sm font-semibold text-neutral-300">No messages yet</h4>
-        <p className="text-xs text-neutral-500 mt-1 max-w-xs">
-          Send a message below to start this conversation.
-        </p>
+      <div className="flex-1 flex items-center justify-center p-8 text-neutral-600 text-[13px] select-none">
+        No Messages
       </div>
     );
   }
@@ -73,10 +68,8 @@ export function MessageList({ messages, isGroup, onOpenLightbox }) {
               }}
             >
               {item.type === 'divider' ? (
-                <div className="flex items-center justify-center my-4">
-                  <span className="text-[11px] font-semibold text-neutral-400 bg-neutral-800/90 border border-neutral-700/50 px-3 py-1 rounded-full shadow-sm">
-                    {formatDateDivider(item.date)}
-                  </span>
+                <div className="text-[11px] font-medium text-neutral-500 text-center select-none py-3">
+                  {formatDateDivider(item.date)}
                 </div>
               ) : (
                 <MessageRow

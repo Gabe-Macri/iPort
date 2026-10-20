@@ -188,7 +188,7 @@ export const mockMessages = {
       id: 2001,
       guid: 'msg-2001',
       chat_id: 102,
-      text: "Hey! Working on the updated iPort interface concepts right now.",
+      text: "Hey, are you around later this afternoon?",
       date: now - 2 * hour,
       is_from_me: 1,
       sender: null,
@@ -201,7 +201,7 @@ export const mockMessages = {
       id: 2002,
       guid: 'msg-2002',
       chat_id: 102,
-      text: "Awesome, can't wait to see it. Making sure it has high contrast dark mode too?",
+      text: "Yeah, should be free after 3. What's up?",
       date: now - 90 * min,
       is_from_me: 0,
       sender: 'alex.miller@example.com',
@@ -214,7 +214,7 @@ export const mockMessages = {
       id: 2003,
       guid: 'msg-2003',
       chat_id: 102,
-      text: "Definitely. Deep blacks, crisp SF typography, fluid animations, and zero-latency WebSocket/SSE updates.",
+      text: "Just wanted to review the new project drafts with you before the sync.",
       date: now - 60 * min,
       is_from_me: 1,
       sender: null,
@@ -222,7 +222,7 @@ export const mockMessages = {
       status: 'read',
       read_at: now - 45 * min,
       reactions: [
-        { type: 2004, emoji: '‼️', sender: 'alex.miller@example.com' }
+        { type: 2001, emoji: '👍', sender: 'alex.miller@example.com' }
       ]
     },
     {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { SquarePen, Settings, Search, X, AlertTriangle } from 'lucide-react';
+import { SquarePen, Settings, Search, X, AlertCircle } from 'lucide-react';
 import { ChatList } from './ChatList';
 
 export function Sidebar({
@@ -20,72 +20,63 @@ export function Sidebar({
   return (
     <aside
       className={`
-        w-full md:w-80 lg:w-96 h-full flex flex-col bg-neutral-900 border-r border-neutral-800/80
-        transition-transform duration-200 ease-out z-10 shrink-0
+        w-full md:w-80 lg:w-[340px] h-full flex flex-col bg-[#161618] border-r border-white/[0.07]
+        transition-transform duration-200 ease-out z-10 shrink-0 select-none
         ${isMobileChatOpen ? 'hidden md:flex' : 'flex'}
       `}
     >
-      {/* Sidebar Header */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-neutral-800/80 glass-header">
-        <div className="flex items-center gap-2.5">
-          <img src="/favicon.svg" alt="iPort" className="w-7 h-7 rounded-lg" />
-          <span className="font-bold text-lg tracking-tight text-white">iPort</span>
-          {isDemo && (
-            <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">
-              Demo
-            </span>
-          )}
+      {/* Top Window Bar */}
+      <div className="h-[52px] px-4 flex items-center justify-between border-b border-white/[0.06]">
+        <div className="flex items-center gap-2">
+          <h1 className="text-[19px] font-bold tracking-tight text-white">Messages</h1>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
+          {showFdaWarning && (
+            <button
+              onClick={onOpenSettings}
+              className="p-1.5 text-amber-400 hover:text-amber-300 rounded-md hover:bg-white/[0.06] transition-colors"
+              title="Full Disk Access Required"
+            >
+              <AlertCircle className="w-4 h-4" />
+            </button>
+          )}
+
           <button
             onClick={onOpenNewChat}
-            className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 active:scale-95 rounded-full transition-all"
+            className="p-1.5 text-neutral-400 hover:text-white rounded-md hover:bg-white/[0.06] active:scale-95 transition-all"
             title="New Message"
           >
             <SquarePen className="w-4 h-4" />
           </button>
+
           <button
             onClick={onOpenSettings}
-            className="p-2 text-neutral-300 hover:text-white hover:bg-neutral-800 active:scale-95 rounded-full transition-all"
-            title="Settings & Diagnostics"
+            className="p-1.5 text-neutral-400 hover:text-white rounded-md hover:bg-white/[0.06] active:scale-95 transition-all"
+            title="Settings"
           >
             <Settings className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Full Disk Access Warning Banner */}
-      {showFdaWarning && (
-        <button
-          onClick={onOpenSettings}
-          className="bg-amber-500/15 border-b border-amber-500/30 text-amber-300 px-4 py-2.5 text-xs flex items-center justify-between hover:bg-amber-500/20 transition-colors text-left"
-        >
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-3.5 h-3.5 shrink-0 text-amber-400" />
-            <span>Full Disk Access Needed</span>
-          </div>
-          <span className="font-semibold underline">Setup &rarr;</span>
-        </button>
-      )}
-
-      {/* Search Input */}
-      <div className="p-3">
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-neutral-400 pointer-events-none" />
+      {/* Search Bar */}
+      <div className="px-3 pt-2.5 pb-2">
+        <div className="relative flex items-center">
+          <Search className="w-3.5 h-3.5 absolute left-2.5 text-neutral-500 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search conversations..."
-            className="w-full bg-neutral-800/90 text-sm text-neutral-100 placeholder-neutral-400 pl-9 pr-8 py-2 rounded-xl border border-neutral-700/60 focus:outline-none focus:border-blue-500 transition-colors"
+            placeholder="Search"
+            className="w-full bg-[#202022] text-[13px] text-neutral-100 placeholder-neutral-500 pl-8 pr-7 py-1.5 rounded-lg border border-white/[0.04] focus:outline-none focus:bg-[#28282a] focus:border-white/10 transition-colors"
           />
           {searchQuery && (
             <button
               onClick={() => onSearchChange('')}
-              className="absolute right-2.5 top-2.5 text-neutral-400 hover:text-neutral-200"
+              className="absolute right-2 text-neutral-500 hover:text-neutral-300 p-0.5"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -104,4 +95,3 @@ export function Sidebar({
     </aside>
   );
 }
-

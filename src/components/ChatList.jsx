@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { formatTime, getInitials, getAvatarGradient } from '../lib/utils';
+import { formatTime, getInitials, getAvatarClass } from '../lib/utils';
 import { Users, MessageSquare, Pin, PinOff } from 'lucide-react';
 import { PinnedTray } from './PinnedTray';
 
@@ -24,7 +24,7 @@ export function ChatList({
     });
   }, [chats, searchQuery, isSearching]);
 
-  // Split into pinned and unpinned when not actively searching
+  // Split into pinned and unpinned when not searching
   const { pinnedChats, unpinnedChats } = useMemo(() => {
     if (isSearching) {
       return { pinnedChats: [], unpinnedChats: filteredChats };
@@ -36,16 +36,16 @@ export function ChatList({
 
   if (filteredChats.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-48 text-neutral-500 text-xs px-4 text-center">
-        <MessageSquare className="w-8 h-8 mb-2 opacity-30" />
-        <p>{isSearching ? 'No conversations found.' : 'No messages yet.'}</p>
+      <div className="flex flex-col items-center justify-center h-40 text-neutral-500 text-xs px-4 text-center">
+        <MessageSquare className="w-6 h-6 mb-2 opacity-30" />
+        <p className="text-neutral-500">{isSearching ? 'No results found.' : 'No conversations.'}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col">
-      {/* Pinned Conversations Tray (Apple-style circles) */}
+    <div className="flex flex-col pb-4">
+      {/* Pinned Tray */}
       {!isSearching && pinnedChats.length > 0 && (
         <PinnedTray
           pinnedChats={pinnedChats}
@@ -55,17 +55,16 @@ export function ChatList({
         />
       )}
 
-      {/* Standard Conversation Rows */}
-      <div className="divide-y divide-neutral-800/40">
+      {/* Conversation List */}
+      <div className="px-2 pt-1.5 space-y-0.5">
         {unpinnedChats.map((chat) => {
           const isActive = activeChat && activeChat.chat_id === chat.chat_id;
-          const isSms = chat.service_name === 'SMS';
           const isGroup = chat.is_group;
           const initials = getInitials(chat.display_name);
+          const avatarClass = getAvatarClass(isGroup);
           const timeStr = chat.last_message ? formatTime(chat.last_message.date) : '';
-          const gradient = getAvatarGradient(isGroup, isSms);
 
-          let snippet = chat.last_message?.text || (chat.last_message ? '📷 Attachment' : 'No messages');
+          let snippet = chat.last_message?.text || (chat.last_message ? 'Attachment' : 'No messages');
           if (chat.last_message?.is_from_me) {
             snippet = `You: ${snippet}`;
           }
@@ -75,68 +74,63 @@ export function ChatList({
               key={chat.chat_id}
               onClick={() => onSelectChat(chat)}
               className={`
-                group flex items-center gap-3 px-3.5 py-3 cursor-pointer transition-colors relative
-                ${isActive ? 'bg-neutral-800/90' : 'hover:bg-neutral-800/40'}
+                group flex items-center gap-3 px-2.5 py-2 rounded-xl cursor-pointer transition-colors relative
+                ${isActive ? 'bg-[#2c2c2e]' : 'hover:bg-[#202022] active:bg-[#262628]'}
               `}
             >
               {/* Avatar */}
               <div
                 className={`
-                  w-11 h-11 rounded-full shrink-0 flex items-center justify-center font-semibold text-white text-sm shadow-sm
-                  bg-gradient-to-tr ${gradient}
+                  w-10 h-10 rounded-full shrink-0 flex items-center justify-center font-medium text-xs
+                  border border-white/[0.06] ${avatarClass}
                 `}
               >
-                {isGroup ? <Users className="w-5 h-5 text-white/90" /> : initials}
+                {isGroup ? <Users className="w-4 h-4 text-neutral-300" /> : initials}
               </div>
 
-              {/* Chat Meta */}
-              <div className="flex-1 min-w-0">
+              {/* Meta */}
+              <div className="flex-1 min-w-0 pr-1">
                 <div className="flex items-baseline justify-between mb-0.5">
-                  <span className="font-semibold text-sm text-neutral-100 truncate tracking-tight">
+                  <span className="font-semibold text-[13.5px] text-neutral-100 truncate tracking-tight">
                     {chat.display_name}
                   </span>
-                  <span className="text-[11px] text-neutral-400 shrink-0 ml-2 font-medium">
+                  <span className="text-[11px] text-neutral-500 shrink-0 ml-2 font-normal">
                     {timeStr}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between gap-1">
-                  <span className="text-xs text-neutral-400 truncate max-w-[200px]">
+                  <span className="text-[12.5px] text-neutral-400 truncate max-w-[200px] leading-tight font-normal">
                     {snippet}
                   </span>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {/* Read receipt indicator if read */}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {/* Read receipt text in list if read */}
                     {chat.last_message?.is_from_me && chat.last_message?.status === 'read' && (
-                      <span className="text-[10px] font-semibold text-blue-400 tracking-tight">
+                      <span className="text-[10px] text-neutral-500 font-normal">
                         Read
                       </span>
                     )}
 
-                    {isSms && (
-                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1 rounded uppercase">
-                        SMS
-                      </span>
-                    )}
-
+                    {/* Unread indicator */}
                     {chat.unread_count > 0 && (
-                      <span className="w-2 h-2 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
+                      <span className="w-2 h-2 rounded-full bg-[#007aff]" />
                     )}
 
-                    {/* Pin button on row hover */}
+                    {/* Pin Action on Hover */}
                     {onTogglePin && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onTogglePin(chat);
                         }}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-400 hover:text-white rounded transition-opacity"
-                        title={chat.is_pinned ? 'Unpin chat' : 'Pin chat to top'}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white rounded transition-opacity"
+                        title={chat.is_pinned ? 'Unpin' : 'Pin'}
                       >
                         {chat.is_pinned ? (
-                          <PinOff className="w-3.5 h-3.5" />
+                          <PinOff className="w-3 h-3" />
                         ) : (
-                          <Pin className="w-3.5 h-3.5" />
+                          <Pin className="w-3 h-3" />
                         )}
                       </button>
                     )}

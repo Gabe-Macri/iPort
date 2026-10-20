@@ -231,11 +231,12 @@ const server = http.createServer(async (req, res) => {
         setTimeout(() => {
           const replyId = ++demoMsgIdCounter;
           const replies = [
-            "Got your message! iPort relay is working great.",
-            "Awesome, looks crystal clear on my end! 🔥",
-            "Sounds like a plan!",
-            "Got it! Responding via iMessage relay.",
-            "Nice! iPort makes texting from any device so smooth."
+            "sounds good",
+            "perfect, see you then",
+            "be there in 5",
+            "on my way!",
+            "sounds great",
+            "ok cool"
           ];
           const replyText = replies[Math.floor(Math.random() * replies.length)];
           const inMsg = {

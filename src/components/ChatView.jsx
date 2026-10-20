@@ -1,8 +1,8 @@
 import React from 'react';
-import { ChevronLeft, Users, MessageSquare, Pin, PinOff } from 'lucide-react';
+import { ChevronLeft, Users, Pin, PinOff } from 'lucide-react';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
-import { getInitials, getAvatarGradient } from '../lib/utils';
+import { getInitials, getAvatarClass } from '../lib/utils';
 
 export function ChatView({
   activeChat,
@@ -16,99 +16,70 @@ export function ChatView({
 }) {
   if (!activeChat) {
     return (
-      <main className="flex-1 hidden md:flex flex-col items-center justify-center p-8 bg-black text-neutral-500 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-4 shadow-sm">
-          <MessageSquare className="w-8 h-8 text-neutral-400" />
-        </div>
-        <h3 className="text-lg font-semibold text-neutral-200">Welcome to iPort</h3>
-        <p className="text-sm text-neutral-400 mt-1 max-w-sm">
-          Select a conversation from the sidebar to view messages, or compose a new text.
-        </p>
+      <main className="flex-1 hidden md:flex items-center justify-center bg-black text-neutral-600 text-[13.5px] select-none">
+        No Conversation Selected
       </main>
     );
   }
 
   const isGroup = Boolean(activeChat.is_group);
-  const isSms = activeChat.service_name === 'SMS';
-  const gradient = getAvatarGradient(isGroup, isSms);
   const initials = getInitials(activeChat.display_name);
+  const avatarClass = getAvatarClass(isGroup);
 
   return (
     <main className="flex-1 flex flex-col h-full bg-black relative min-w-0">
       {/* Chat Header */}
-      <header className="h-14 px-4 flex items-center justify-between border-b border-neutral-800/80 glass-header shrink-0 z-10">
+      <header className="h-[52px] px-4 flex items-center justify-between border-b border-white/[0.06] bg-[#161618]/90 backdrop-blur-xl shrink-0 z-10 select-none">
         <div className="flex items-center gap-3 min-w-0">
           {/* Back button for mobile */}
           <button
             onClick={onBack}
-            className="md:hidden -ml-2 p-1.5 text-blue-500 hover:text-blue-400 flex items-center gap-0.5 text-sm font-medium active:scale-95 transition-all"
+            className="md:hidden -ml-1.5 p-1 text-[#007aff] hover:opacity-80 flex items-center gap-0.5 text-[14px] font-normal active:scale-95 transition-all"
           >
-            <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-            <span>Back</span>
+            <ChevronLeft className="w-5 h-5 stroke-[2.2]" />
+            <span>Messages</span>
           </button>
 
-          {/* Avatar */}
+          {/* Small Avatar */}
           <div
             className={`
-              w-9 h-9 rounded-full shrink-0 flex items-center justify-center font-semibold text-white text-xs shadow-sm
-              bg-gradient-to-tr ${gradient}
+              w-7 h-7 rounded-full shrink-0 flex items-center justify-center font-medium text-[11px]
+              border border-white/[0.08] ${avatarClass}
             `}
           >
-            {isGroup ? <Users className="w-4 h-4 text-white/90" /> : initials}
+            {isGroup ? <Users className="w-3.5 h-3.5 text-neutral-300" /> : initials}
           </div>
 
-          {/* Title & Subtitle */}
+          {/* Contact Details */}
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-neutral-100 truncate tracking-tight">
+            <h2 className="text-[13.5px] font-semibold text-neutral-100 truncate tracking-tight leading-tight">
               {activeChat.display_name}
             </h2>
-            <div className="flex items-center gap-1.5 text-[11px] text-neutral-400">
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  connectionStatus === 'connected'
-                    ? 'bg-emerald-500'
-                    : connectionStatus === 'connecting'
-                    ? 'bg-amber-500 animate-pulse'
-                    : 'bg-rose-500'
-                }`}
-              />
+            <div className="flex items-center gap-1.5 text-[11px] text-neutral-500 font-normal leading-tight">
               <span className="truncate">
                 {isGroup
                   ? `${activeChat.participants?.length || 1} people`
-                  : activeChat.chat_identifier || 'iMessage'}
+                  : activeChat.chat_identifier || ''}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Action Controls & Service Badge */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Right Header Controls */}
+        <div className="flex items-center gap-1 shrink-0">
           {onTogglePin && (
             <button
               onClick={() => onTogglePin(activeChat)}
-              className={`p-1.5 rounded-full transition-colors ${
+              className={`p-1.5 rounded-md transition-colors ${
                 activeChat.is_pinned
-                  ? 'text-blue-400 bg-blue-500/10 hover:bg-blue-500/20'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                  ? 'text-[#007aff] hover:bg-white/[0.06]'
+                  : 'text-neutral-400 hover:text-white hover:bg-white/[0.06]'
               }`}
-              title={activeChat.is_pinned ? 'Unpin conversation' : 'Pin conversation to top'}
+              title={activeChat.is_pinned ? 'Unpin' : 'Pin to top'}
             >
               {activeChat.is_pinned ? <PinOff className="w-3.5 h-3.5" /> : <Pin className="w-3.5 h-3.5" />}
             </button>
           )}
-
-          <span
-            className={`
-              text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border
-              ${
-                isSms
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                  : 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-              }
-            `}
-          >
-            {isSms ? 'SMS' : 'iMessage'}
-          </span>
         </div>
       </header>
 
@@ -128,4 +99,3 @@ export function ChatView({
     </main>
   );
 }
-

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, AlertCircle, Laptop, Wifi, Globe, Terminal } from 'lucide-react';
+import { X, Check, AlertTriangle, Laptop, Terminal, MessageSquare, Wifi, Globe } from 'lucide-react';
 
 export function SettingsModal({ isOpen, onClose, diagnostics, isDemo }) {
   if (!isOpen) return null;
@@ -9,141 +9,144 @@ export function SettingsModal({ isOpen, onClose, diagnostics, isDemo }) {
   const applescriptOk = diagnostics?.applescriptAvailable;
 
   return (
-    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-[#1c1c1e] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
-        <div className="h-14 px-5 flex items-center justify-between border-b border-neutral-800 shrink-0">
-          <h3 className="font-semibold text-neutral-100 text-base">Server Status & Setup</h3>
+        <div className="h-12 px-4 flex items-center justify-between border-b border-white/[0.06] shrink-0">
+          <h3 className="font-semibold text-white text-[15px] tracking-tight">Settings</h3>
           <button
             onClick={onClose}
-            className="p-1.5 text-neutral-400 hover:text-white rounded-full hover:bg-neutral-800 transition-colors"
+            className="w-7 h-7 bg-[#2c2c2e] hover:bg-[#3a3a3c] text-neutral-400 hover:text-white rounded-full flex items-center justify-center transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-5 overflow-y-auto space-y-5 text-sm">
-          {/* Mode Badge */}
-          <div className="flex items-center justify-between p-3.5 bg-neutral-800/60 rounded-xl border border-neutral-700/60">
-            <div>
-              <div className="font-semibold text-neutral-200">Relay Engine</div>
-              <div className="text-xs text-neutral-400 mt-0.5">
-                {isDemo
-                  ? 'Demo / Simulation Mode (Mock data)'
-                  : 'Live macOS iMessage Relay (Active)'}
+        <div className="p-4 overflow-y-auto space-y-5 text-[13px]">
+          {/* Service Mode */}
+          <div>
+            <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-1 mb-1.5">
+              Service
+            </div>
+            <div className="bg-[#252528] border border-white/[0.06] rounded-xl overflow-hidden divide-y divide-white/[0.06]">
+              <div className="px-3.5 py-2.5 flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-white">Relay Mode</div>
+                  <div className="text-[11px] text-neutral-400">
+                    {isDemo
+                      ? 'Simulated environment'
+                      : 'Live macOS Messages database'}
+                  </div>
+                </div>
+                <span className="text-[12px] font-medium text-neutral-300">
+                  {isDemo ? 'Demo Mode' : 'Live Sync'}
+                </span>
               </div>
             </div>
-            <span
-              className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${
-                isDemo
-                  ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-              }`}
-            >
-              {isDemo ? 'Demo Mode' : 'Live Sync'}
-            </span>
           </div>
 
-          {/* Diagnostics Checklist */}
+          {/* System Permissions */}
           <div>
-            <h4 className="font-semibold text-neutral-300 text-xs uppercase tracking-wider mb-2.5">
-              macOS System & Permissions
-            </h4>
-            <div className="space-y-2 bg-neutral-800/40 p-3 rounded-xl border border-neutral-800">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-neutral-300 flex items-center gap-2">
+            <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-1 mb-1.5">
+              Permissions & Status
+            </div>
+            <div className="bg-[#252528] border border-white/[0.06] rounded-xl overflow-hidden divide-y divide-white/[0.06]">
+              {/* Full Disk Access */}
+              <div className="px-3.5 py-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 text-neutral-200">
                   <Laptop className="w-4 h-4 text-neutral-400" />
-                  Full Disk Access (chat.db)
-                </span>
-                <span className="flex items-center gap-1 font-medium">
+                  <span>Full Disk Access</span>
+                </div>
+                <div className="flex items-center gap-1.5">
                   {fdaGranted ? (
-                    <>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">Granted</span>
-                    </>
+                    <span className="text-[12px] text-neutral-300 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5 text-[#34c759]" />
+                      Granted
+                    </span>
                   ) : (
-                    <>
-                      <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                      <span className="text-amber-400">Required</span>
-                    </>
+                    <span className="text-[12px] text-amber-400 flex items-center gap-1 font-medium">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      Required
+                    </span>
                   )}
-                </span>
+                </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-neutral-300 flex items-center gap-2">
+              {/* AppleScript */}
+              <div className="px-3.5 py-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 text-neutral-200">
                   <Terminal className="w-4 h-4 text-neutral-400" />
-                  AppleScript Dispatcher
-                </span>
-                <span className="flex items-center gap-1 font-medium">
+                  <span>AppleScript Sender</span>
+                </div>
+                <span className="text-[12px] text-neutral-300 flex items-center gap-1">
                   {applescriptOk ? (
                     <>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">Ready</span>
+                      <Check className="w-3.5 h-3.5 text-[#34c759]" />
+                      Available
                     </>
                   ) : (
-                    <>
-                      <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
-                      <span className="text-rose-400">Error</span>
-                    </>
+                    <span className="text-rose-400">Unavailable</span>
                   )}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-neutral-300 flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-neutral-400" />
-                  Messages App
-                </span>
-                <span className="text-xs text-neutral-400">
-                  {messagesRunning ? 'Running' : 'Starts automatically on send'}
+              {/* Messages App */}
+              <div className="px-3.5 py-2.5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5 text-neutral-200">
+                  <MessageSquare className="w-4 h-4 text-neutral-400" />
+                  <span>Messages App</span>
+                </div>
+                <span className="text-[12px] text-neutral-400">
+                  {messagesRunning ? 'Running' : 'Ready'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* FDA Setup instructions if needed */}
+          {/* Full Disk Access Setup Steps if needed */}
           {!fdaGranted && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3.5 text-xs text-amber-200 space-y-1.5">
-              <div className="font-semibold text-amber-300 flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" />
-                How to enable Full Disk Access:
+            <div className="bg-[#252528] border border-amber-500/20 rounded-xl p-3.5 text-[12px] text-neutral-300 space-y-1.5">
+              <div className="font-medium text-amber-400 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Enable Full Disk Access on this Mac
               </div>
-              <ol className="list-decimal list-inside space-y-1 text-amber-200/90 pl-1">
+              <ol className="list-decimal list-inside space-y-1 text-neutral-400 pl-1 leading-relaxed">
                 <li>Open <strong>System Settings</strong> on your Mac.</li>
-                <li>Go to <strong>Privacy & Security → Full Disk Access</strong>.</li>
-                <li>Toggle ON <strong>Terminal</strong> (or <strong>iTerm</strong> / <strong>Node</strong>).</li>
+                <li>Navigate to <strong>Privacy & Security → Full Disk Access</strong>.</li>
+                <li>Allow <strong>Terminal</strong> (or <strong>iTerm</strong> / <strong>Node</strong>).</li>
                 <li>Restart iPort in your terminal.</li>
               </ol>
             </div>
           )}
 
-          {/* Accessing Outside Home */}
+          {/* Remote Access */}
           <div>
-            <h4 className="font-semibold text-neutral-300 text-xs uppercase tracking-wider mb-2.5">
-              Access from Non-Apple Devices
-            </h4>
-            <div className="space-y-3">
-              <div className="bg-neutral-800/50 p-3 rounded-xl border border-neutral-800">
-                <div className="flex items-center gap-2 font-medium text-xs text-neutral-300 mb-1">
-                  <Wifi className="w-4 h-4 text-blue-400" />
-                  Same Wi-Fi Network
+            <div className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-1 mb-1.5">
+              Network Access
+            </div>
+            <div className="bg-[#252528] border border-white/[0.06] rounded-xl overflow-hidden divide-y divide-white/[0.06]">
+              {/* Local Network */}
+              <div className="p-3.5 space-y-1.5">
+                <div className="flex items-center gap-2 text-neutral-200 font-medium">
+                  <Wifi className="w-4 h-4 text-neutral-400" />
+                  <span>Local Network</span>
                 </div>
-                <div className="bg-black/60 px-3 py-1.5 rounded-lg font-mono text-xs text-emerald-400 select-all">
+                <div className="bg-[#18181a] px-3 py-1.5 rounded-lg font-mono text-[11.5px] text-neutral-300 select-all border border-white/[0.04]">
                   http://{window.location.hostname}:{window.location.port || '3000'}
                 </div>
               </div>
 
-              <div className="bg-neutral-800/50 p-3 rounded-xl border border-neutral-800">
-                <div className="flex items-center gap-2 font-medium text-xs text-neutral-300 mb-1">
-                  <Globe className="w-4 h-4 text-indigo-400" />
-                  Anywhere Outside Home (Tailscale or Cloudflare)
+              {/* Remote / Tailscale */}
+              <div className="p-3.5 space-y-1.5">
+                <div className="flex items-center gap-2 text-neutral-200 font-medium">
+                  <Globe className="w-4 h-4 text-neutral-400" />
+                  <span>Outside Home Network</span>
                 </div>
-                <p className="text-xs text-neutral-400 mb-2">
-                  Use <strong>Tailscale</strong> (recommended zero-config private mesh) or run a Cloudflare Tunnel:
+                <p className="text-[11.5px] text-neutral-400">
+                  Use <strong>Tailscale</strong> (recommended) or a Cloudflare Tunnel:
                 </p>
-                <div className="bg-black/60 px-3 py-1.5 rounded-lg font-mono text-xs text-neutral-300 select-all">
+                <div className="bg-[#18181a] px-3 py-1.5 rounded-lg font-mono text-[11.5px] text-neutral-300 select-all border border-white/[0.04]">
                   cloudflared tunnel --url http://localhost:3000
                 </div>
               </div>
@@ -152,10 +155,10 @@ export function SettingsModal({ isOpen, onClose, diagnostics, isDemo }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-neutral-800 flex justify-end shrink-0">
+        <div className="px-4 py-3 border-t border-white/[0.06] flex justify-end shrink-0">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium text-sm rounded-xl transition-colors"
+            className="px-4 py-1.5 bg-[#007aff] hover:bg-[#0071e3] text-white font-medium text-[13px] rounded-lg transition-colors"
           >
             Done
           </button>

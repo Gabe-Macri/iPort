@@ -4,21 +4,21 @@ A **clean, fast, and minimal iMessage web relay** that lets you access, view, an
 
 ---
 
-## ✨ Features
+##  Features
 
-- **⚡ Fast & Minimal:** Boots in `< 20ms` using Node.js's built-in native SQLite and standard web protocols.
-- **📌 Pinned Conversations:** Apple-style circular avatar pins at the top of the conversation list. Pin or unpin any chat with a single click.
-- **👁️ Read Receipts:** Full delivered and read status with exact read timestamps (e.g. `"Read 10:42 AM"`), queried directly from macOS `chat.db` `date_read`.
-- **📱 True Cross-Device Web Client:** Neat, minimalist Apple-inspired web interface with deep OLED dark mode, mobile drawer navigation, and PWA (install to home screen).
-- **🔄 Real-Time Push Sync:** Instant incoming and outgoing message updates powered by Server-Sent Events (SSE).
-- **💬 Full Message Support:**
+- **Fast & Minimal:** Boots in `< 20ms` using Node.js's built-in native SQLite and standard web protocols.
+- **Pinned Conversations:** Apple-style circular avatar pins at the top of the conversation list. Pin or unpin any chat with a single click.
+- **Read Receipts:** Full delivered and read status with exact read timestamps (e.g. `"Read 10:42 AM"`), queried directly from macOS `chat.db` `date_read`.
+- **True Cross-Device Web Client:** Neat, minimalist Apple-inspired web interface with deep OLED dark mode, mobile drawer navigation, and PWA (install to home screen).
+- **Real-Time Push Sync:** Instant incoming and outgoing message updates powered by Server-Sent Events (SSE).
+- **Full Message Support:**
   - Group chats & 1-on-1 conversations
   - iMessage (Blue) and SMS (Green) distinctions
   - Tapbacks & Reactions (❤️, 👍, 👎, 😂, ‼️, ❓)
   - Photos & Attachment previews with interactive lightbox
   - Contact initials avatars & delivery timestamps
-- **🔒 Optional PIN Protection:** Protect your personal messages with a private passcode before opening the relay to local or remote networks.
-- **🌐 Remote Access Ready:** Access from anywhere outside home via **Tailscale** (recommended zero-config) or **Cloudflare Tunnel**.
+- **Optional PIN Protection:** Protect your personal messages with a private passcode before opening the relay to local or remote networks.
+- **Remote Access Ready:** Access from anywhere outside home via **Tailscale** (recommended zero-config) or **Cloudflare Tunnel**.
 
 ---
 
@@ -143,7 +143,7 @@ iPort/
 
 ## 💻 Single-Command Startup & Development
 
-- **🚀 Unified Production Mode (Default - One Command, Port 3000):**
+- **Unified Production Mode (Default - One Command, Port 3000):**
   ```bash
   ./start.sh
   ```
@@ -161,7 +161,7 @@ iPort/
   - Concurrently runs the backend API server on port 3000 AND the Vite live HMR client on port 5173 in a single terminal.
   - A single `Ctrl+C` cleanly terminates both processes.
 
-- **📦 Manual Rebuild (Optional):**
+- **Manual Rebuild (Optional):**
   ```bash
   npm run build
   ```
